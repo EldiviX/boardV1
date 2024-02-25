@@ -4,10 +4,11 @@ import multer from 'multer';
 
 import { registerValidation, loginValidation, adCreateValidation } from './validations.js';
 
-import checkAuth from "./utils/checkAuth.js";
+import { UserController, AdController } from "./controllers/index.js";
 
-import * as UserController from "./controllers/UserController.js";
-import * as AdController from "./controllers/AdController.js";
+import checkAuth from "./utils/checkAuth.js";
+import handleValidationErrors from "./utils/handleValidationErrors.js";
+
 
 mongoose.connect("mongodb://127.0.0.1:27017/board")
     .then(() => console.log('DB Connected'))
@@ -29,8 +30,8 @@ const upload = multer({ storage });
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
-app.post('/auth/login', loginValidation, UserController.login);
-app.post('/auth/register', registerValidation, UserController.register);
+app.post('/auth/login', loginValidation, handleValidationErrors, UserController.login);
+app.post('/auth/register', registerValidation, handleValidationErrors, UserController.register);
 app.get('/auth/me', checkAuth, UserController.getMe);
 
 app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
@@ -41,7 +42,7 @@ app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
 
 app.get('/ads', AdController.getAll);
 app.get('/ads/:id', AdController.getOne);
-app.post('/ads', checkAuth, adCreateValidation, AdController.create);
+app.post('/ads', checkAuth, adCreateValidation, handleValidationErrors, AdController.create);
 app.delete('/ads/:id', checkAuth, AdController.remove);
 // app.patch('/ads', AdController.update);
 
