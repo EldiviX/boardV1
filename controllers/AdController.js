@@ -2,7 +2,7 @@ import AdModel from '../models/Ad.js'
 
 export const getAll = async (req, res) => {
     try {
-        const ads = await AdModel.find().populate('user').exec();
+        const ads = await AdModel.find().populate({"path": "user", "select": "name"}).exec();
 
         res.json(ads)
     } catch (err) {
@@ -17,7 +17,7 @@ export const getOne = async (req, res) => {
     try {
         const adId = req.params.id;
 
-        const ad = await AdModel.findOne({ _id: adId }).populate('user').exec();
+        const ad = await AdModel.findOne({ _id: adId }).populate({"path": "user", "select": "name"}).exec();
 
         if (!ad) {
             return res.status(404).json({ message: "Объявление не найдено" });
@@ -75,6 +75,39 @@ export const create = async (req, res) => {
         console.log(err);
         res.status(500).json({
             message: "Не удалось создать объявление"
-        })
-    }
+        });
+    };
+};
+
+export const update = async (req, res) => {
+    try {
+        const adId = req.params.id;
+        console.log(adId);
+
+        await AdModel.updateOne(
+            {
+                _id: adId
+            },
+            {
+                title: req.body.title,
+                text: req.body.text,
+                category: req.body.category,
+                type: req.body.type,
+                price: req.body.price,
+                phone: req.body.phone,
+                location: req.body.location,
+                imageUrl: req.body.imageUrl,
+                user: req.userId,
+            },
+        );
+
+        res.json({
+            success: true,
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            message: "Не удалось обновить объявление"
+        });
+    };
 }

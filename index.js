@@ -44,7 +44,7 @@ app.get('/ads', AdController.getAll);
 app.get('/ads/:id', AdController.getOne);
 app.post('/ads', checkAuth, adCreateValidation, handleValidationErrors, AdController.create);
 app.delete('/ads/:id', checkAuth, AdController.remove);
-// app.patch('/ads', AdController.update);
+app.patch('/ads/:id', checkAuth, AdController.update);
 
 app.listen(4444, (err) => {
     if (err) {
